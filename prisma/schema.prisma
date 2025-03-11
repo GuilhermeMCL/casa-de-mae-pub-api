@@ -1,0 +1,61 @@
+model Produto {
+  id          String       @id @default(uuid())
+  nome        String       @unique
+  preco       Float
+  itensPedido ItemPedido[] // Relacionamento inverso
+}
+
+model Mesa {
+  id      String   @id @default(uuid())
+  numero  Int      @unique
+  ocupada Boolean  @default(false)
+  pedidos Pedido[]
+  ordens  Ordem[]
+}
+
+model Pedido {
+  id       String       @id @default(uuid())
+  mesaId   String
+  mesa     Mesa         @relation(fields: [mesaId], references: [id])
+  itens    ItemPedido[]
+  status   StatusPedido @default(PENDENTE)
+  criadoEm DateTime     @default(now())
+}
+
+model ItemPedido {
+  id         String  @id @default(uuid())
+  pedidoId   String
+  pedido     Pedido  @relation(fields: [pedidoId], references: [id])
+  produtoId  String
+  produto    Produto @relation(fields: [produtoId], references: [id])
+  quantidade Int
+}
+
+enum StatusPedido {
+  PENDENTE
+  PREPARANDO
+  PRONTO
+  ENTREGUE
+}
+
+model Ordem {
+  id             String         @id @default(uuid())
+  mesaId         String
+  mesa           Mesa           @relation(fields: [mesaId], references: [id])
+  total          Float
+  desconto       Float          @default(0)
+  formaPagamento FormaPagamento
+  status         StatusOrdem    @default(FECHADA)
+  criadoEm       DateTime       @default(now())
+}
+
+enum FormaPagamento {
+  DINHEIRO
+  CARTAO
+  PIX
+}
+
+enum StatusOrdem {
+  ABERTA
+  FECHADA
+}
